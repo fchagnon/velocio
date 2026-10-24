@@ -40,7 +40,7 @@ Velocio is hosted by Slack itself (Run on Slack infrastructure), so there is no 
 
    Then run `slack doctor` to confirm the CLI can see Deno.
 
-2. **Unzip this folder** into your home directory (for example, ~/velocio) and cd into it.
+2. **Get the code.** Clone this repository and cd into it.
 
 ## Testing on your own machine
 
@@ -89,6 +89,8 @@ slack trigger create --trigger-def triggers/every_hour.ts
 - **Look at his memory:** `slack datastore query '{"datastore": "announcements"}'`
 - **Channels:** he can post in public channels without being invited. A private channel needs `/invite @Velocio`.
 
-## Retiring the Python version
+## Coming next: webhooks
 
-Run only one Velocio at a time, or rides get announced twice. Once the hosted version is posting, stop the old Python version's `slack run`. You can then remove the old app by running `slack delete` from the Python version's folder.
+Today Velocio polls the results pages every hour and works out for himself when a brevet is finished. An upcoming change will let the club website tell him directly instead: when a chapter VP submits an event's results, the site will send the ride to Velocio through a Slack webhook trigger, and he'll announce it right away. That removes the guesswork (the 12-hour wait and the cutoff estimate) and the scraping.
+
+His message wording, sorting and chapter-to-channel routing won't change. Only what starts him will: the webhook trigger will replace the hourly one.
