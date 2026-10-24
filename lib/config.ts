@@ -17,10 +17,10 @@ export const DEFAULT_CHANNEL = "#app-testing";
  *   Brevets:    chapter comes from the results page they're listed on.
  */
 export const CHAPTER_CHANNELS: Record<string, string> = {
-  // huron: "#huron",
-  // toronto: "#toronto",
-  // ottawa: "#ottawa",
-  // "simcoe-muskoka": "#simcoe-muskoka",
+   huron: "C025GSEGB61",
+   toronto: "C0269J2CSNL",
+   ottawa: "C025S3RBZNG",
+   "simcoe-muskoka": "C025KT6B7BL",
 };
 
 export const CHAPTER_NAMES: Record<string, string> = {
