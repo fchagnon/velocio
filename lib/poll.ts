@@ -120,13 +120,17 @@ export async function pollOnce(deps: PollDeps): Promise<PollSummary> {
     await deps.store.putMany(recs);
   };
 
-  // ---- permanents: each new finish, as soon as it appears
+  // ---- permanents: once the ride is past its cutoff and nobody is PENDING,
+  // everyone not yet announced goes out together in one post. Riders who
+  // submit before the cutoff wait for their ridemates; anyone who submits
+  // later still gets announced on their own.
   if (permanents.length === 0) {
     summary.warnings.push("Permanents: parsed zero results. Has the page layout changed?");
   } else {
     const seeding = ![...records.values()].some((r) => r.kind === "permanent");
     summary.seededPermanents = seeding;
     for (const event of [...permanents].reverse()) { // oldest first
+      if (!seeding && (!brevetComplete(event) || now < latestCutoff(event))) continue;
       // A PENDING or blank result isn't final yet, so leave it for a later run.
       const fresh = event.riders.filter((r) =>
         !records.has(permKey(event, r)) && r.status !== null && r.status !== "PENDING"

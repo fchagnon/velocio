@@ -9,7 +9,7 @@ Velocio is hosted by Slack itself (Run on Slack infrastructure), so there is no 
 
 ## When things get announced
 
-- **Permanents:** as soon as a result appears and isn't PENDING.
+- **Permanents:** once the ride is past its cutoff and no rider is PENDING. Ridemates on the same permanent are announced together in one post. Anyone who submits after that gets their own post.
 - **Brevets and populaires:** only when all of these are true:
   - 12 hours have passed since the event's first result appeared.
   - The latest possible cutoff has passed (the start date, plus a day for a late start, plus the ACP time limit).

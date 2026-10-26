@@ -1,6 +1,6 @@
 import { SlackFunctionTester } from "deno-slack-sdk/mod.ts";
 import PollResults from "../functions/poll_results.ts";
-import { setPicker } from "../lib/messages.ts";
+import { channelFor, setPicker } from "../lib/messages.ts";
 import { assert, assertEquals, ev, page } from "./helpers.ts";
 
 setPicker((list) => list[0]);
@@ -57,7 +57,7 @@ Deno.test("function: seeds silently, then posts a new permanent through chat.pos
     result = await PollResults(createContext({ inputs: { mode: "poll" } }));
     assertEquals(result.error, undefined);
     assertEquals(result.outputs?.posted, 1);
-    assertEquals(world.posts[0].channel, "#app-testing");
+    assertEquals(world.posts[0].channel, channelFor("huron"));
     assertEquals(world.posts[0].unfurl_links, "false");
     assert(world.posts[0].text.includes("Rei Kawamura"), world.posts[0].text);
   } finally {
