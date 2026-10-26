@@ -1,5 +1,5 @@
 import { parseResults } from "../lib/parse.ts";
-import { buildMessage, setPicker } from "../lib/messages.ts";
+import { buildMessage, setPicker, setRoller } from "../lib/messages.ts";
 import { assert, assertEquals, ev, page } from "./helpers.ts";
 
 setPicker((list) => list[0]);
@@ -32,7 +32,7 @@ Deno.test("group message sorts by last word of name and lists DNFs", () => {
     ["Corina Radoiu", "OTL"],
     ["Karl Caris", "9:12"],
   ])));
-  const text = buildMessage(e, "huron")!;
+  const text = buildMessage(e, "huron", "brevet")!;
   const order = ["Karl Caris", "Corina Radoiu", "Philip De Vries"].map((n) => text.indexOf(`|${n}>`));
   assert(order.every((i, k) => i > 0 && (k === 0 || i > order[k - 1])), text);
   assert(text.includes("3 riders started, 2 finished."), text);
@@ -45,11 +45,11 @@ Deno.test("solo finish gets a personal post with badge; solo DNF gets none", () 
   const [solo] = parseResults(page(ev("Original 200", "ottawa", "September 26, 2026", 200, [
     ["Ben Maynard", "8:38", "First Brevet"],
   ])));
-  const text = buildMessage(solo, "ottawa")!;
-  assert(text.startsWith(":tada: *Look who just finished!*"), text);
+  const text = buildMessage(solo, "ottawa", "brevet")!;
+  assert(text.startsWith(":tada: *Look who just finished a brevet!*"), text);
   assert(text.endsWith("first brevet, welcome to the club!"), text);
   const [dnf] = parseResults(page(ev("Hotcake 300", "huron", "September 7, 2026", 300, [["Dija Amer", "DNF"]])));
-  assertEquals(buildMessage(dnf, "huron"), null);
+  assertEquals(buildMessage(dnf, "huron", "brevet"), null);
 });
 
 Deno.test("parses markup shaped like the site's real results component", () => {
@@ -73,4 +73,27 @@ Deno.test("parses markup shaped like the site's real results component", () => {
     ["Peter Grant", "DNF", []],
     ["Tim O'Callahan", "DQ", []],
   ]);
+});
+
+Deno.test("posts name the ride type, and permanents invite people to ride one", () => {
+  const [perm] = parseResults(page(ev("Mean Streets", "toronto", "October 1, 2026", 200, [
+    ["Italo Bravo", "13:13"],
+    ["Kourosh Alasvand", "12:41"],
+  ])));
+  setRoller(() => 0); // invite included
+  const p = buildMessage(perm, "toronto", "permanent")!;
+  assert(p.includes("Mean Streets>* permanent"), p);
+  assert(p.includes("Toronto route"), p);
+  assert(p.includes("register/permanent|Register a permanent>"), p);
+  setRoller(() => 0.99); // invite skipped
+  assert(!buildMessage(perm, "toronto", "permanent")!.includes("Register a permanent"));
+
+  const b = buildMessage(perm, "toronto", "brevet")!;
+  assert(b.includes("Mean Streets>* brevet") && b.includes("Toronto chapter"), b);
+  assert(!b.includes("Register a permanent"), b);
+
+  const [pop] = parseResults(page(ev("Blini Populaire", "huron", "September 8, 2026", 80, [["Ken Jobba", "3:14"]])));
+  const t = buildMessage(pop, "huron", "populaire")!;
+  assert(t.includes("Blini Populaire>*") && !t.includes("Populaire>* populaire"), t);
+  assert(!/\*[^*<]*\*<|>\*[^*]*\*!\*/.test(b), "no bold nested in bold");
 });

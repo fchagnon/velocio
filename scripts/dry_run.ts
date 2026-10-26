@@ -32,8 +32,8 @@ for (const chapter of BREVET_CHAPTERS) {
 }
 
 console.log("\nSample posts:\n");
-for (const { event, chapter } of await latestSamples(fetchPage)) {
-  console.log(`[-> ${channelFor(chapter)}]`);
-  console.log(buildMessage(event, chapter) ?? "(no post: lone rider did not finish)");
+for (const { event, chapter, kind } of await latestSamples(fetchPage)) {
+  console.log(`[${kind} -> ${channelFor(chapter)}]`);
+  console.log(buildMessage(event, chapter, kind) ?? "(no post: lone rider did not finish)");
   console.log();
 }

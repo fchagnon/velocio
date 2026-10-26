@@ -12,7 +12,7 @@ import {
   TIME_LIMITS,
 } from "./config.ts";
 import { parseResults, type RideEvent, type Rider, routeSlug } from "./parse.ts";
-import { buildMessage, channelFor } from "./messages.ts";
+import { buildMessage, channelFor, type RideKind, rideKind } from "./messages.ts";
 
 export interface SeenRecord {
   key: string;
@@ -144,7 +144,7 @@ export async function pollOnce(deps: PollDeps): Promise<PollSummary> {
         signature: `${r.status}`,
       }));
       recs.forEach((r) => records.set(r.key, r));
-      const text = seeding ? null : buildMessage(event, event.routeChapter, fresh);
+      const text = seeding ? null : buildMessage(event, event.routeChapter, "permanent", fresh);
       if (text) {
         await announce(channelFor(event.routeChapter), text, recs);
         log(`Announced permanent ${event.route} on ${event.date} (${fresh.length} riders)`);
@@ -194,7 +194,7 @@ export async function pollOnce(deps: PollDeps): Promise<PollSummary> {
 
       if (complete && now >= earliestAnnounce(event, new Date(rec.first_seen))) {
         const done = { ...rec, announced: true, signature: sig };
-        const text = buildMessage(event, chapter);
+        const text = buildMessage(event, chapter, rideKind(false, event.km));
         if (text) {
           await announce(channelFor(chapter), text, [done]);
           log(`Announced ${key} (${event.riders.length} riders)`);
@@ -219,15 +219,15 @@ export async function pollOnce(deps: PollDeps): Promise<PollSummary> {
 export async function latestSamples(
   fetchPage: PollDeps["fetchPage"],
   now = new Date(),
-): Promise<Array<{ event: RideEvent; chapter: string }>> {
+): Promise<Array<{ event: RideEvent; chapter: string; kind: RideKind }>> {
   const year = now.getUTCFullYear();
-  const out: Array<{ event: RideEvent; chapter: string }> = [];
+  const out: Array<{ event: RideEvent; chapter: string; kind: RideKind }> = [];
   const perms = parseResults(await fetchPage(year, "permanent"));
-  if (perms[0]) out.push({ event: perms[0], chapter: perms[0].routeChapter });
+  if (perms[0]) out.push({ event: perms[0], chapter: perms[0].routeChapter, kind: "permanent" });
   for (const chapter of BREVET_CHAPTERS) {
     const hit = parseResults(await fetchPage(year, chapter)).find((e) => brevetComplete(e) && e.riders.length > 1);
     if (hit) {
-      out.push({ event: hit, chapter });
+      out.push({ event: hit, chapter, kind: rideKind(false, hit.km) });
       break;
     }
   }

@@ -74,8 +74,8 @@ export default SlackFunction(PollResultsFunction, async ({ inputs, client }) => 
   try {
     if (inputs.mode === "sample") {
       let posted = 0;
-      for (const { event, chapter } of await latestSamples(fetchPage)) {
-        const text = buildMessage(event, chapter);
+      for (const { event, chapter, kind } of await latestSamples(fetchPage)) {
+        const text = buildMessage(event, chapter, kind);
         if (text) {
           await post(DEFAULT_CHANNEL, text);
           posted++;

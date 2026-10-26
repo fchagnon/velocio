@@ -73,3 +73,9 @@ export const TIME_LIMITS: Array<[number, number]> = [
 export const ANNOUNCE_SOLO_DNF = false;
 
 export const USER_AGENT = "VelocioBot/1.0 (Randonneurs Ontario Slack bot)";
+
+/**
+ * How often a permanent post ends with a nudge to register a permanent of
+ * your own: 0 never, 1 always, 0.25 about one post in four.
+ */
+export const PERMANENT_INVITE_CHANCE = 0.00;
