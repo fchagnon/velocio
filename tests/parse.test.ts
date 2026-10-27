@@ -1,3 +1,4 @@
+import { PERMANENT_INVITE_CHANCE } from "../lib/config.ts";
 import { parseResults } from "../lib/parse.ts";
 import { buildMessage, setPicker, setRoller } from "../lib/messages.ts";
 import { assert, assertEquals, ev, page } from "./helpers.ts";
@@ -75,7 +76,7 @@ Deno.test("parses markup shaped like the site's real results component", () => {
   ]);
 });
 
-Deno.test("posts name the ride type, and permanents invite people to ride one", () => {
+Deno.test("posts name the ride type, and the permanent invite follows its setting", () => {
   const [perm] = parseResults(page(ev("Mean Streets", "toronto", "October 1, 2026", 200, [
     ["Italo Bravo", "13:13"],
     ["Kourosh Alasvand", "12:41"],
@@ -84,7 +85,7 @@ Deno.test("posts name the ride type, and permanents invite people to ride one", 
   const p = buildMessage(perm, "toronto", "permanent")!;
   assert(p.includes("Mean Streets>* permanent"), p);
   assert(p.includes("Toronto route"), p);
-  assert(p.includes("register/permanent|Register a permanent>"), p);
+  assert(p.includes("Register a permanent") === PERMANENT_INVITE_CHANCE > 0, p);
   setRoller(() => 0.99); // invite skipped
   assert(!buildMessage(perm, "toronto", "permanent")!.includes("Register a permanent"));
 

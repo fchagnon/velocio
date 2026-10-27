@@ -79,3 +79,4 @@ export const USER_AGENT = "VelocioBot/1.0 (Randonneurs Ontario Slack bot)";
  * your own: 0 never, 1 always, 0.25 about one post in four.
  */
 export const PERMANENT_INVITE_CHANCE = 0.00;
+export const AWARDS_CHANNEL = "C081RLNEQGK"; // #achievement-awards
